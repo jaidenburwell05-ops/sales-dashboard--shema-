@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRAMEWORK</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1117;--card:#181c27;--card2:#1e2336;--border:rgba(255,255,255,0.08);--text:#e8eaf0;--muted:#6b7280;--green:#3fe0a0;--blue:#5fa8ff;--amber:#ffb347;--red:#ff6b6b;--purple:#a78bfa;--r:10px;--ri:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--card2);border-radius:3px}
+.header{background:var(--card);border-bottom:.5px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0}
+.logo-text h1{font-size:15px;font-weight:700}
+.logo-text p{font-size:10px;color:var(--muted);margin-top:1px;letter-spacing:.3px}
+.header-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-group label{font-size:11px;color:var(--muted);white-space:nowrap}
+input[type=date],select{background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--ri);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer}
+.btn{background:var(--green);color:#0f1117;border:none;padding:6px 14px;border-radius:var(--ri);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.btn-sm{background:rgba(95,168,255,0.15);color:var(--blue);border:.5px solid rgba(95,168,255,0.3);padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;text-decoration:none;display:inline-block}
+.live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.status-bar{padding:10px 24px;font-size:12px;display:none}
+.status-bar.error{background:rgba(255,107,107,0.1);border-bottom:.5px solid rgba(255,107,107,0.2);color:var(--red);display:block}
+.status-bar.info{background:rgba(95,168,255,0.08);border-bottom:.5px solid rgba(95,168,255,0.15);color:var(--blue);display:block}
+.content{padding:20px 24px;max-width:1600px;margin:0 auto}
+.section{margin-bottom:24px}
+.sec-title{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:12px;border-radius:2px;background:currentColor}
+.sec-title.green{color:var(--green)}.sec-title.blue{color:var(--blue)}.sec-title.amber{color:var(--amber)}.sec-title.red{color:var(--red)}.sec-title.purple{color:var(--purple)}
+.card{background:var(--card);border:.5px solid var(--border);border-radius:var(--r);padding:18px}
+.card.al{border-left:3px solid var(--green)}.card.bl{border-left:3px solid var(--blue)}.card.aml{border-left:3px solid var(--amber)}.card.rl{border-left:3px solid var(--red)}.card.pl{border-left:3px solid var(--purple)}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--card);border:.5px solid var(--border);border-radius:var(--r);padding:16px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.g::after{background:var(--green)}.kpi.b::after{background:var(--blue)}.kpi.a::after{background:var(--amber)}.kpi.r::after{background:var(--red)}.kpi.p::after{background:var(--purple)}
+.kpi-lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.kpi-val{font-size:26px;font-weight:700;line-height:1;margin-bottom:3px}
+.kpi.g .kpi-val{color:var(--green)}.kpi.b .kpi-val{color:var(--blue)}.kpi.a .kpi-val{color:var(--amber)}.kpi.r .kpi-val{color:var(--red)}.kpi.p .kpi-val{color:var(--purple)}
+.kpi-sub{font-size:10px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.bg{background:rgba(63,224,160,.12);color:var(--green);border:.5px solid rgba(63,224,160,.2)}
+.br{background:rgba(255,107,107,.12);color:var(--red);border:.5px solid rgba(255,107,107,.2)}
+.ba{background:rgba(255,179,71,.12);color:var(--amber);border:.5px solid rgba(255,179,71,.2)}
+.bb{background:rgba(95,168,255,.12);color:var(--blue);border:.5px solid rgba(95,168,255,.2)}
+.bp{background:rgba(167,139,250,.12);color:var(--purple);border:.5px solid rgba(167,139,250,.2)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:.5px solid var(--border);font-weight:500;white-space:nowrap}
+td{padding:10px 12px;border-bottom:.5px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tr-tot td{background:var(--card2);font-weight:600;border-top:.5px solid var(--border)}
+.tr-flag td{background:rgba(255,107,107,.04)}
+.gb-wrap{min-width:90px}
+.gb-track{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.gb-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ch{position:relative;height:240px}
+.rec-list{display:flex;flex-direction:column;gap:8px}
+.rec-row{background:var(--card2);border:.5px solid var(--border);border-radius:var(--ri);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.rec-lead{font-weight:600;font-size:13px}
+.rec-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.rec-sum{font-size:11px;color:var(--text);opacity:.7;max-width:480px;margin-top:3px}
+.obj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.obj-card{background:var(--card2);border:.5px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--r);padding:14px}
+.obj-type{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.obj-count{font-size:28px;font-weight:700}
+.obj-pct{font-size:11px;color:var(--muted);margin-top:2px}
+.fb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.fb-card{background:var(--card2);border:.5px solid var(--border);border-left:3px solid var(--red);border-radius:var(--r);padding:14px}
+.fb-name{font-weight:600;font-size:12px;color:var(--red);margin-bottom:5px}
+.fb-txt{font-size:12px;opacity:.8;line-height:1.6}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.pp-card{background:var(--card2);border:.5px solid var(--border);border-radius:var(--r);padding:14px}
+.pp-lead{font-weight:600;font-size:13px;margin-bottom:8px}
+.pp-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+.pp-k{color:var(--muted)}
+.pp-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.val-list{display:flex;flex-direction:column;gap:7px}
+.val-item{background:var(--card2);border:.5px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--ri);padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px}
+.val-item.vr{border-left-color:var(--red)}
+.val-item.vc{border-left-color:var(--green);color:var(--green)}
+.dup-list{display:flex;flex-direction:column;gap:7px}
+.dup-item{background:rgba(255,107,107,.06);border:.5px solid rgba(255,107,107,.2);border-radius:var(--ri);padding:10px 14px;font-size:12px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;color:var(--muted);gap:8px;text-align:center}
+.spin{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;align-items:center;justify-content:center;padding:32px;gap:10px;color:var(--muted)}
+@media(max-width:900px){.charts-row{grid-template-columns:1fr}.header{padding:12px 16px}.content{padding:14px}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <div class="logo-text"><h1>FRAME<span style="color:var(--green)">WORK</span></h1><p>Sales Dashboard · EOD · EOC · Post Booking · Objections · Validation</p></div>
+  </div>
+  <div class="header-controls">
+    <div class="filter-group"><label>From</label><input type="date" id="df"></div>
+    <div class="filter-group"><label>To</label><input type="date" id="dt"></div>
+    <button class="btn" onclick="applyFilters()">Apply</button>
+    <div class="filter-group">
+      <label>Rep</label>
+      <select id="rf" onchange="applyFilters()">
+        <option value="all">All Reps</option>
+        <optgroup label="Closers"><option>Ellis</option><option>Loreen</option><option>Jaiden</option></optgroup>
+        <optgroup label="Setters"><option>Loma</option><option>Ishaan</option></optgroup>
+      </select>
+    </div>
+    <div class="live"><div class="pulse"></div><span id="upd">—</span></div>
+  </div>
+</header>
+
+<div id="statusBar" class="status-bar"></div>
+
+<div class="content">
+
+  <div class="section">
+    <div class="sec-title green">Key Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi g"><div class="kpi-lbl">Rev Generated</div><div class="kpi-val" id="k-rev">—</div><div class="kpi-sub">Total pipeline</div></div>
+      <div class="kpi b"><div class="kpi-lbl">Cash Collected</div><div class="kpi-val" id="k-cash">—</div><div class="kpi-sub">Confirmed payments</div></div>
+      <div class="kpi p"><div class="kpi-lbl">Deals Closed</div><div class="kpi-val" id="k-deals">—</div><div class="kpi-sub">Paid calls</div></div>
+      <div class="kpi a"><div class="kpi-lbl">Show Rate</div><div class="kpi-val" id="k-show">—</div><div class="kpi-sub">Goal: 85%</div></div>
+      <div class="kpi g"><div class="kpi-lbl">Close Rate</div><div class="kpi-val" id="k-close">—</div><div class="kpi-sub">Goal: 30%</div></div>
+      <div class="kpi r"><div class="kpi-lbl">Data Flags</div><div class="kpi-val" id="k-flags">—</div><div class="kpi-sub">Issues detected</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title blue">Call Recordings — Fathom</div>
+    <div class="card bl" id="recSection"><div class="loading"><div class="spin"></div> Loading...</div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title green">Closer Performance</div>
+    <div class="card al"><div class="tw"><table>
+      <thead><tr><th>Closer</th><th>Scheduled</th><th>Shown</th><th>Qual Leads</th><th>Offers</th><th>Closed</th><th>Cash</th><th>Rev</th><th>Show%</th><th>Close Rate vs 30% Goal</th></tr></thead>
+      <tbody id="ctBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+    </table></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title purple">Setter Performance</div>
+    <div class="card pl"><div class="tw"><table>
+      <thead><tr><th>Setter</th><th>Sets</th><th>Shown</th><th>Qual Leads</th><th>Closed</th><th>Cash</th><th>Rev</th><th>Set→Close%</th><th>Show%</th><th>Show Rate vs 85% Goal</th></tr></thead>
+      <tbody id="stBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+    </table></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title green">Charts</div>
+    <div class="charts-row">
+      <div class="card"><div style="font-size:12px;font-weight:600;margin-bottom:3px">Rev by Closer</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Revenue generated per closer</div><div class="ch"><canvas id="revChart"></canvas></div></div>
+      <div class="card"><div style="font-size:12px;font-weight:600;margin-bottom:3px">Show Rate — All Reps</div><div style="font-size:11px;color:var(--muted);margin-bottom:14px">Green ≥85% · Amber 70–84% · Red &lt;70%</div><div class="ch"><canvas id="showChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title blue">End of Call Reports</div>
+    <div class="card bl"><div class="tw"><table>
+      <thead><tr><th></th><th>Lead Email</th><th>Closer</th><th>Setter</th><th>Showed</th><th>Offer Made</th><th>Cash</th><th>Rev</th><th>Outcome</th><th>Recording</th></tr></thead>
+      <tbody id="eocBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+    </table></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title amber">Data Validation — EOC vs EOD Cross-Check</div>
+    <div class="card aml" id="valSection"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title red">Duplicate Detection</div>
+    <div class="card rl" id="dupSection"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title amber">Common Objections</div>
+    <div class="obj-grid" id="objSection"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title red">EOD Bottlenecks — Closer Feedback</div>
+    <div class="fb-grid" id="fbSection"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title purple">Post Booking Pipeline</div>
+    <div class="pp-grid" id="ppSection"><div class="loading"><div class="spin"></div></div></div>
+  </div>
+
+</div>
+
+<script>
+const SID = '1xWAaQD3Dwb8Vr324xOLpPMvdy9dk0tpTt_ld-Uw5cLU';
+const CLOSERS = ['Ellis','Loreen','Jaiden'];
+const SETTERS = ['Loma','Ishaan','Loreen'];
+let D = {eoc:[],eodC:[],eodS:[],pb:[]};
+let F = {eoc:[],eodC:[],eodS:[],pb:[]};
+let charts = {};
+
+async function gviz(sheet) {
+  const url = `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
+  const r = await fetch(url);
+  const t = await r.text();
+  // gviz wraps in google.visualization.Query.setResponse(...)
+  const start = t.indexOf('{');
+  const end = t.lastIndexOf('}');
+  if (start === -1 || end === -1) return [];
+  const j = JSON.parse(t.substring(start, end+1));
+  if (!j.table || !j.table.rows) return [];
+  const cols = j.table.cols.map(c => c.label || '');
+  return j.table.rows
+    .filter(r => r.c && r.c.some(c => c && c.v != null))
+    .map(row => {
+      const o = {};
+      row.c.forEach((c,i) => { o[cols[i]] = c ? (c.f || c.v) : null; });
+      return o;
+    });
+}
+
+function showStatus(msg, type='info') {
+  const el = document.getElementById('statusBar');
+  el.className = `status-bar ${type}`;
+  el.textContent = msg;
+}
+
+async function loadAll() {
+  document.getElementById('upd').textContent = 'Loading...';
+  try {
+    showStatus('Connecting to Google Sheets...', 'info');
+    const [eoc, eodC, eodS, pb] = await Promise.all([
+      gviz('Form Responses 2'),
+      gviz('Form Responses 3'),
+      gviz('Form Responses 4'),
+      gviz('Form Responses 5'),
+    ]);
+    D = {eoc, eodC, eodS, pb};
+    const total = eoc.length + eodC.length + eodS.length + pb.length;
+    if (total === 0) {
+      showStatus('⚠ Connected but no data found. Make sure your sheet is shared as "Anyone with the link → Viewer" and form responses are linked to the sheet.', 'error');
+    } else {
+      document.getElementById('statusBar').style.display = 'none';
+    }
+    applyFilters();
+    document.getElementById('upd').textContent = `Updated ${new Date().toLocaleTimeString()} · ${eoc.length} EOC rows`;
+  } catch(e) {
+    showStatus(`⚠ Could not load data: ${e.message}. If you're opening this file locally, host it on GitHub Pages first — local files can't fetch from Google.`, 'error');
+    document.getElementById('upd').textContent = 'Error';
+  }
+}
+
+function applyFilters() {
+  const from = document.getElementById('df').value;
+  const to = document.getElementById('dt').value;
+  const rep = document.getElementById('rf').value;
+  const filter = (arr) => arr.filter(r => {
+    if (!r) return false;
+    if (from || to) {
+      const ts = Object.values(r).find(v => v && String(v).match(/\d{1,2}\/\d{1,2}\/\d{4}/)) || '';
+      const d = new Date(ts);
+      if (from && !isNaN(d) && d < new Date(from)) return false;
+      if (to && !isNaN(d) && d > new Date(to + 'T23:59:59')) return false;
+    }
+    if (rep !== 'all') {
+      if (!Object.values(r).some(v => String(v||'').toLowerCase() === rep.toLowerCase())) return false;
+    }
+    return true;
+  });
+  F = {eoc:filter(D.eoc), eodC:filter(D.eodC), eodS:filter(D.eodS), pb:filter(D.pb)};
+  render();
+}
+
+// Helpers
+const $f = v => {
+  const n = parseFloat(String(v||'').replace(/[$,k]/gi, v => v==='k'?'000':''));
+  return isNaN(n) || n===0 ? '$0' : '$' + n.toLocaleString();
+};
+const num = v => { const n = parseFloat(String(v||'').replace(/[$,k]/gi, v => v==='k'?'000':'')); return isNaN(n)?0:n; };
+const sum = (arr,k) => arr.reduce((s,r) => s+num(r[k]),0);
+const pct = (a,b) => b>0 ? ((a/b)*100).toFixed(0)+'%' : '0%';
+const fk = (obj, opts) => {
+  if (!obj) return opts[0];
+  for (const o of opts) if (Object.prototype.hasOwnProperty.call(obj,o)) return o;
+  const ks = Object.keys(obj||{});
+  for (const o of opts) { const m = ks.find(k=>k.toLowerCase().includes(o.toLowerCase().split(' ')[0])); if(m) return m; }
+  return opts[0];
+};
+const isYes = v => String(v||'').toLowerCase().trim() === 'yes';
+const isNo = v => { const s = String(v||'').toLowerCase().trim(); return s==='no'||s===''; };
+
+function goalBar(val, goal) {
+  const pv = Math.min(100,(val/goal)*100);
+  const c = val>=goal ? 'var(--green)' : val>=goal*.7 ? 'var(--amber)' : 'var(--red)';
+  const lbl = val>=goal
+    ? `<span class="badge bg" style="font-size:10px">✓ ${val.toFixed(0)}%</span>`
+    : `<span class="badge br" style="font-size:10px">need +${(goal-val).toFixed(0)}%</span>`;
+  return `<div class="gb-wrap"><div class="gb-track"><div class="gb-fill" style="width:${pv}%;background:${c}"></div></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">${lbl}<span style="font-size:10px;color:var(--muted)">${val.toFixed(0)}%</span></div></div>`;
+}
+
+function render() {
+  renderKPIs(); renderRec(); renderCloser(); renderSetter();
+  renderCharts(); renderEOC(); renderVal(); renderDup();
+  renderObj(); renderFB(); renderPP();
+}
+
+function renderKPIs() {
+  const e = F.eoc;
+  if (!e.length) { ['k-rev','k-cash','k-deals','k-show','k-close','k-flags'].forEach(id => document.getElementById(id).textContent='0'); return; }
+  const ck = fk(e[0],['Cash Collected','Cash Collected ($)','cash']);
+  const rk = fk(e[0],['Rev Generated','Revenue Generated','Rev']);
+  const sk = fk(e[0],['Show Up','Show','Showed','showed']);
+  const ok = fk(e[0],['Offer Made','Offer']);
+  const tc = sum(e,ck), tr = sum(e,rk)||tc;
+  const deals = e.filter(r=>num(r[ck])>0).length;
+  const shown = e.filter(r=>isYes(r[sk])).length;
+  const showR = e.length>0?(shown/e.length)*100:0;
+  const closeR = shown>0?(deals/shown)*100:0;
+  const flags = e.filter(r=>isYes(r[ok])&&num(r[ck])===0).length;
+  document.getElementById('k-rev').textContent = $f(tr);
+  document.getElementById('k-cash').textContent = $f(tc);
+  document.getElementById('k-deals').textContent = deals;
+  document.getElementById('k-show').textContent = showR.toFixed(0)+'%';
+  document.getElementById('k-close').textContent = closeR.toFixed(0)+'%';
+  document.getElementById('k-flags').textContent = flags;
+}
+
+function renderRec() {
+  const e = F.eoc;
+  const el = document.getElementById('recSection');
+  if (!e.length) { el.innerHTML='<div class="empty"><span>🎙️</span>No EOC data loaded yet</div>'; return; }
+  const rk = fk(e[0],['Call Recording','Recording','Fathom','recording']);
+  const ek = fk(e[0],['Lead Email','Email','email','Lead Email (same as CRM)']);
+  const ck = fk(e[0],['Closer','closer']);
+  const sk = fk(e[0],['Setter','setter']);
+  const sum2 = fk(e[0],['Brief Summary','Summary','Brief Summary of The Call','summary']);
+  const outk = fk(e[0],['Outcome','outcome','What was the o']);
+  const recs = e.filter(r=>r[rk]&&String(r[rk]).startsWith('http'));
+  if (!recs.length) { el.innerHTML='<div class="empty"><span>🎙️</span>No Fathom links submitted yet — closers need to paste their Fathom URL in the EOC form</div>'; return; }
+  el.innerHTML='<div class="rec-list">'+recs.map(r=>`
+    <div class="rec-row">
+      <div><div class="rec-lead">${r[ek]||'Unknown'}</div><div class="rec-meta">Closer: <b>${r[ck]||'—'}</b> · Setter: <b>${r[sk]||'—'}</b> · Outcome: <b>${r[outk]||'—'}</b></div>${r[sum2]?`<div class="rec-sum">${r[sum2]}</div>`:''}</div>
+      <a href="${r[rk]}" target="_blank" class="btn-sm">View ↗</a>
+    </div>`).join('')+'</div>';
+}
+
+function renderCloser() {
+  const e = F.eoc, ec = F.eodC;
+  const ck2 = e.length?fk(e[0],['Closer','closer']):'Closer';
+  const cashk = e.length?fk(e[0],['Cash Collected','Cash Collected ($)']):'Cash Collected';
+  const revk = e.length?fk(e[0],['Rev Generated','Revenue Generated']):'Rev Generated';
+  const showk = e.length?fk(e[0],['Show Up','Show','Showed']):'Show Up';
+  const offerk = e.length?fk(e[0],['Offer Made','Offer']):'Offer Made';
+
+  const rows = CLOSERS.map(c => {
+    const mine = e.filter(r=>String(r[ck2]||'').toLowerCase()===c.toLowerCase());
+    const eodMine = ec.filter(r=>Object.values(r).some(v=>String(v||'').toLowerCase()===c.toLowerCase()));
+    const sched = eodMine.reduce((s,r)=>s+num(r[fk(r,['Calls Scheduled','Scheduled','calls scheduled'])||'0']),0)||mine.length;
+    const shown = mine.filter(r=>isYes(r[showk])).length;
+    const offers = mine.filter(r=>isYes(r[offerk])).length;
+    const closed = mine.filter(r=>num(r[cashk])>0).length;
+    const cash = sum(mine,cashk), rev = sum(mine,revk)||cash;
+    const qual = eodMine.reduce((s,r)=>s+num(r[fk(r,['Qualified Leads','Qualified','qualified'])||'0']),0)||shown;
+    const sp = sched>0?(shown/sched)*100:0, cp = shown>0?(closed/shown)*100:0;
+    return {name:c,sched,shown,qual,offers,closed,cash,rev,sp,cp};
+  });
+  const tot = rows.reduce((t,r)=>({name:'TOTALS',sched:t.sched+r.sched,shown:t.shown+r.shown,qual:t.qual+r.qual,offers:t.offers+r.offers,closed:t.closed+r.closed,cash:t.cash+r.cash,rev:t.rev+r.rev,sp:0,cp:0}),{name:'TOTALS',sched:0,shown:0,qual:0,offers:0,closed:0,cash:0,rev:0,sp:0,cp:0});
+  tot.sp=tot.sched>0?(tot.shown/tot.sched)*100:0; tot.cp=tot.shown>0?(tot.closed/tot.shown)*100:0;
+  const rh = r=>`<tr ${r.name==='TOTALS'?'class="tr-tot"':''}>
+    <td><b>${r.name}</b></td><td>${r.sched}</td><td>${r.shown}</td><td>${r.qual}</td>
+    <td>${r.offers}</td><td>${r.closed}</td>
+    <td style="color:var(--green)">${$f(r.cash)}</td><td style="color:var(--blue)">${$f(r.rev)}</td>
+    <td>${r.sp.toFixed(0)}%</td><td>${goalBar(r.cp,30)}</td></tr>`;
+  document.getElementById('ctBody').innerHTML=[...rows,tot].map(rh).join('');
+}
+
+function renderSetter() {
+  const e = F.eoc, pb = F.pb;
+  const setk = e.length?fk(e[0],['Setter','setter']):'Setter';
+  const cashk = e.length?fk(e[0],['Cash Collected','Cash Collected ($)']):'Cash Collected';
+  const revk = e.length?fk(e[0],['Rev Generated','Revenue Generated']):'Rev Generated';
+  const showk = e.length?fk(e[0],['Show Up','Show','Showed']):'Show Up';
+  const sbk = pb.length?fk(pb[0],['Set By','set by','Setter']):'Set By';
+
+  const rows = SETTERS.map(s => {
+    const mine = e.filter(r=>String(r[setk]||'').toLowerCase()===s.toLowerCase());
+    const sets = pb.filter(r=>String(r[sbk]||'').toLowerCase()===s.toLowerCase()).length||mine.length;
+    const shown = mine.filter(r=>isYes(r[showk])).length;
+    const closed = mine.filter(r=>num(r[cashk])>0).length;
+    const cash = sum(mine,cashk), rev = sum(mine,revk)||cash;
+    const scp = sets>0?(closed/sets)*100:0, shp = sets>0?(shown/sets)*100:0;
+    return {name:s,sets,shown,qual:shown,closed,cash,rev,scp,shp};
+  });
+  const tot = rows.reduce((t,r)=>({name:'TOTALS',sets:t.sets+r.sets,shown:t.shown+r.shown,qual:t.qual+r.qual,closed:t.closed+r.closed,cash:t.cash+r.cash,rev:t.rev+r.rev,scp:0,shp:0}),{name:'TOTALS',sets:0,shown:0,qual:0,closed:0,cash:0,rev:0,scp:0,shp:0});
+  tot.scp=tot.sets>0?(tot.closed/tot.sets)*100:0; tot.shp=tot.sets>0?(tot.shown/tot.sets)*100:0;
+  const rh=r=>`<tr ${r.name==='TOTALS'?'class="tr-tot"':''}>
+    <td><b>${r.name}</b></td><td>${r.sets}</td><td>${r.shown}</td><td>${r.qual}</td>
+    <td>${r.closed}</td><td style="color:var(--green)">${$f(r.cash)}</td><td style="color:var(--blue)">${$f(r.rev)}</td>
+    <td>${r.scp.toFixed(0)}%</td><td>${r.shp.toFixed(0)}%</td><td>${goalBar(r.shp,85)}</td></tr>`;
+  document.getElementById('stBody').innerHTML=[...rows,tot].map(rh).join('');
+}
+
+function renderCharts() {
+  const e = F.eoc;
+  const ck2 = e.length?fk(e[0],['Closer','closer']):'Closer';
+  const sk2 = e.length?fk(e[0],['Setter','setter']):'Setter';
+  const cashk = e.length?fk(e[0],['Cash Collected','Cash Collected ($)']):'Cash Collected';
+  const revk = e.length?fk(e[0],['Rev Generated','Revenue Generated']):'Rev Generated';
+  const showk = e.length?fk(e[0],['Show Up','Show','Showed']):'Show Up';
+
+  const rev = CLOSERS.map(c=>sum(e.filter(r=>String(r[ck2]||'').toLowerCase()===c.toLowerCase()),revk)||sum(e.filter(r=>String(r[ck2]||'').toLowerCase()===c.toLowerCase()),cashk));
+  if (charts.rev) charts.rev.destroy();
+  const co = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e2336',titleColor:'#e8eaf0',bodyColor:'#6b7280',padding:10}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',font:{family:'DM Sans'}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',font:{family:'DM Sans'}}}}};
+  charts.rev = new Chart(document.getElementById('revChart'),{type:'bar',data:{labels:CLOSERS,datasets:[{data:rev,backgroundColor:['rgba(63,224,160,0.5)','rgba(95,168,255,0.5)','rgba(167,139,250,0.5)'],borderColor:['#3fe0a0','#5fa8ff','#a78bfa'],borderWidth:1,borderRadius:5}]},options:{...co,scales:{...co.scales,y:{...co.scales.y,ticks:{...co.scales.y.ticks,callback:v=>'$'+v.toLocaleString()}}}}});
+
+  const allReps=[...CLOSERS,...SETTERS.filter(s=>!CLOSERS.includes(s))];
+  const showPcts=allReps.map(r=>{const mine=e.filter(row=>String(row[ck2]||'').toLowerCase()===r.toLowerCase()||String(row[sk2]||'').toLowerCase()===r.toLowerCase());return mine.length>0?(mine.filter(row=>isYes(row[showk])).length/mine.length)*100:0;});
+  const sc=showPcts.map(v=>v>=85?'rgba(63,224,160,0.5)':v>=70?'rgba(255,179,71,0.5)':'rgba(255,107,107,0.5)');
+  const sb=showPcts.map(v=>v>=85?'#3fe0a0':v>=70?'#ffb347':'#ff6b6b');
+  if (charts.show) charts.show.destroy();
+  charts.show=new Chart(document.getElementById('showChart'),{type:'bar',data:{labels:allReps,datasets:[{data:showPcts,backgroundColor:sc,borderColor:sb,borderWidth:1,borderRadius:5}]},options:{...co,scales:{...co.scales,y:{max:100,...co.scales.y,ticks:{...co.scales.y.ticks,callback:v=>v+'%'}}}}});
+}
+
+function renderEOC() {
+  const e = F.eoc;
+  if (!e.length) { document.getElementById('eocBody').innerHTML='<tr><td colspan="10"><div class="empty"><span>📋</span>No EOC data — submit your first EOC form to see data here</div></td></tr>'; return; }
+  const ek=fk(e[0],['Lead Email','Email','Lead Email (same as CRM)']);
+  const ck2=fk(e[0],['Closer','closer']);
+  const sk2=fk(e[0],['Setter','setter']);
+  const showk=fk(e[0],['Show Up','Show','Showed']);
+  const ok2=fk(e[0],['Offer Made','Offer']);
+  const cashk=fk(e[0],['Cash Collected','Cash Collected ($)']);
+  const revk=fk(e[0],['Rev Generated','Revenue Generated']);
+  const outk=fk(e[0],['Outcome','outcome','What was the o']);
+  const reck=fk(e[0],['Call Recording','Recording','Fathom']);
+  document.getElementById('eocBody').innerHTML=e.map(r=>{
+    const flag=isYes(r[ok2])&&num(r[cashk])===0;
+    const rec=r[reck]&&String(r[reck]).startsWith('http');
+    return `<tr class="${flag?'tr-flag':''}">
+      <td>${flag?'⚠️':''}</td>
+      <td>${r[ek]||'—'}</td><td>${r[ck2]||'—'}</td><td>${r[sk2]||'—'}</td>
+      <td>${isYes(r[showk])?'<span class="badge bg">Yes</span>':'<span class="badge br">No</span>'}</td>
+      <td>${isYes(r[ok2])?'<span class="badge bb">Yes</span>':'<span class="badge ba">No</span>'}</td>
+      <td style="color:var(--green)">${$f(r[cashk])}</td>
+      <td style="color:var(--blue)">${$f(r[revk]||r[cashk])}</td>
+      <td style="max-width:200px;font-size:11px">${r[outk]||'—'}</td>
+      <td>${rec?`<a href="${r[reck]}" target="_blank" class="btn-sm">View ↗</a>`:'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderVal() {
+  const e=F.eoc, ec=F.eodC;
+  const cashk=e.length?fk(e[0],['Cash Collected','Cash Collected ($)']):'Cash Collected';
+  const ck2=e.length?fk(e[0],['Closer','closer']):'Closer';
+  const ok2=e.length?fk(e[0],['Offer Made','Offer']):'Offer Made';
+  const issues=[];
+  CLOSERS.forEach(c=>{
+    const eocC=sum(e.filter(r=>String(r[ck2]||'').toLowerCase()===c.toLowerCase()),cashk);
+    const eodRows=ec.filter(r=>Object.values(r).some(v=>String(v||'').toLowerCase()===c.toLowerCase()));
+    const eodC2=eodRows.reduce((s,r)=>s+num(r[fk(r,['Cash Collected','Cash Collected ($)'])]),0);
+    if(eodC2>0&&Math.abs(eocC-eodC2)>50) issues.push({type:'vr',msg:`${c}: EOC shows ${$f(eocC)} but EOD shows ${$f(eodC2)} — difference of ${$f(Math.abs(eocC-eodC2))}`});
+  });
+  const bad=e.filter(r=>isYes(r[ok2])&&num(r[cashk])===0);
+  if(bad.length) issues.push({type:'vr',msg:`${bad.length} call${bad.length>1?'s':''} marked "Offer Made" but $0 cash — check if these are follow-ups or data entry errors`});
+  const el=document.getElementById('valSection');
+  el.innerHTML=issues.length
+    ? `<div class="val-list">${issues.map(i=>`<div class="val-item ${i.type}">⚠️ ${i.msg}</div>`).join('')}</div>`
+    : '<div class="val-list"><div class="val-item vc">✓ No mismatches detected — EOC and EOD totals align</div></div>';
+}
+
+function renderDup() {
+  const e=F.eoc, pb=F.pb;
+  const ek=e.length?fk(e[0],['Lead Email','Email','Lead Email (same as CRM)']):'Lead Email';
+  const lk=pb.length?fk(pb[0],['Lead Name','Lead','Name']):'Lead Name';
+  const all=[...e.map(r=>r[ek]),...pb.map(r=>r[lk])].filter(Boolean).map(v=>String(v).toLowerCase().trim());
+  const counts={};
+  all.forEach(v=>{counts[v]=(counts[v]||0)+1;});
+  const dups=Object.entries(counts).filter(([,v])=>v>1);
+  const el=document.getElementById('dupSection');
+  el.innerHTML=dups.length
+    ? `<div class="dup-list">${dups.map(([v,c])=>`<div class="dup-item">🔴 <b>${v}</b> — appears ${c}x across EOC + Post Booking</div>`).join('')}</div>`
+    : '<div class="val-list"><div class="val-item vc">✓ No duplicates detected across EOC and Post Booking forms</div></div>';
+}
+
+function renderObj() {
+  const e=F.eoc, pb=F.pb;
+  const outk=e.length?fk(e[0],['Outcome','outcome','What was the o']):'Outcome';
+  const pbk=pb.length?fk(pb[0],['Possible Objections','Objections']):'Possible Objections';
+  const txt=[...e.map(r=>String(r[outk]||'')), ...pb.map(r=>String(r[pbk]||''))].join(' ').toLowerCase();
+  const total=e.length+pb.length||1;
+  const types=['Fear','Partner','Time','Parents'];
+  const counts=types.map(t=>({type:t,n:(txt.match(new RegExp(t.toLowerCase(),'g'))||[]).length})).filter(o=>o.n>0);
+  const el=document.getElementById('objSection');
+  el.innerHTML=counts.length
+    ? counts.map(o=>`<div class="obj-card"><div class="obj-type">${o.type}</div><div class="obj-count">${o.n}</div><div class="obj-pct">${((o.n/total)*100).toFixed(1)}% of all entries</div></div>`).join('')
+    : '<div class="empty"><span>💬</span>No objection keywords found yet — data appears once EOC and Post Booking forms are filled out</div>';
+}
+
+function renderFB() {
+  const ec=F.eodC;
+  const fbk=ec.length?fk(ec[0],['Feedback','feedback','Notes','Bottleneck']):'Feedback';
+  const nk=ec.length?fk(ec[0],['Closer','closer','Rep','Name']):'Closer';
+  const fb=ec.filter(r=>r[fbk]&&String(r[fbk]).trim().length>2);
+  const el=document.getElementById('fbSection');
+  el.innerHTML=fb.length
+    ? fb.map(r=>`<div class="fb-card"><div class="fb-name">${r[nk]||'Closer'}</div><div class="fb-txt">${r[fbk]}</div></div>`).join('')
+    : '<div class="empty"><span>📝</span>No feedback submitted — appears when closers fill in the Feedback field on their EOD form</div>';
+}
+
+function renderPP() {
+  const pb=F.pb;
+  if(!pb.length){document.getElementById('ppSection').innerHTML='<div class="empty"><span>📅</span>No post-booking data yet — appears when setters submit the Post Booking form</div>';return;}
+  const lk=fk(pb[0],['Lead Name','Lead','Name']);
+  const sbk=fk(pb[0],['Set By','set by','Setter']);
+  const btk=fk(pb[0],['Booked To','Booked to','Closer']);
+  const hwk=fk(pb[0],['How It Was Set','How was it set','Source']);
+  const bdk=fk(pb[0],['Budget','budget']);
+  const ok2=fk(pb[0],['Possible Objections','Objections']);
+  const bc=b=>{if(!b)return'bb';if(b.includes('4k')||b.includes('4K')||b.includes('4,'))return'bg';if(b.includes('Financing')||b.includes('financing'))return'bp';return'ba';};
+  document.getElementById('ppSection').innerHTML=pb.map(r=>`
+    <div class="pp-card">
+      <div class="pp-lead">${r[lk]||'Unknown Lead'}</div>
+      <div class="pp-row"><span class="pp-k">Set by</span><span>${r[sbk]||'—'}</span></div>
+      <div class="pp-row"><span class="pp-k">Booked to</span><span>${r[btk]||'—'}</span></div>
+      <div class="pp-row"><span class="pp-k">How set</span><span>${r[hwk]||'—'}</span></div>
+      <div class="pp-badges">
+        ${r[bdk]?`<span class="badge ${bc(r[bdk])}">${r[bdk]}</span>`:''}
+        ${r[ok2]&&String(r[ok2]).trim()?`<span class="badge ba">⚠ ${r[ok2]}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+loadAll();
+setInterval(loadAll, 120000);
+</script>
+</body>
+</html>
