@@ -1,4 +1,4 @@
-<index.html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -165,10 +165,28 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
   <div class="section">
     <div class="sec-title blue">End of Call Reports</div>
-    <div class="card bl"><div class="tw"><table>
-      <thead><tr><th></th><th>Lead Email</th><th>Closer</th><th>Setter</th><th>Showed</th><th>Offer Made</th><th>Cash</th><th>Rev</th><th>Outcome</th><th>Recording</th></tr></thead>
-      <tbody id="eocBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
-    </table></div></div>
+    <div class="card bl">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="text" id="eocSearch" placeholder="Search lead, closer, setter..." oninput="searchEOC()" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;width:240px">
+          <span id="eocCount" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="eocPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+          <span id="eocPageLabel" style="font-size:11px;color:var(--muted);white-space:nowrap">Page 1</span>
+          <button onclick="eocPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+        </div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th></th><th>Lead Email</th><th>Closer</th><th>Setter</th><th>Showed</th><th>Offer Made</th><th>Cash</th><th>Rev</th><th>Outcome</th><th>Recording</th></tr></thead>
+        <tbody id="eocBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px">
+        <button onclick="eocPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+        <span id="eocPageLabel2" style="font-size:11px;color:var(--muted)">Page 1</span>
+        <button onclick="eocPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+      </div>
+    </div>
   </div>
 
   <div class="section">
@@ -176,10 +194,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="card aml" id="valSection"><div class="loading"><div class="spin"></div></div></div>
   </div>
 
-  <div class="section">
-    <div class="sec-title red">Duplicate Detection</div>
-    <div class="card rl" id="dupSection"><div class="loading"><div class="spin"></div></div></div>
-  </div>
+
 
   <div class="section">
     <div class="sec-title amber">Common Objections</div>
@@ -307,7 +322,7 @@ function goalBar(val, goal) {
 
 function render() {
   renderKPIs(); renderRec(); renderCloser(); renderSetter();
-  renderCharts(); renderEOC(); renderVal(); renderDup();
+  renderCharts(); renderEOC(); renderVal();
   renderObj(); renderFB(); renderPP();
 }
 
@@ -428,9 +443,41 @@ function renderCharts() {
   charts.show=new Chart(document.getElementById('showChart'),{type:'bar',data:{labels:allReps,datasets:[{data:showPcts,backgroundColor:sc,borderColor:sb,borderWidth:1,borderRadius:5}]},options:{...co,scales:{...co.scales,y:{max:100,...co.scales.y,ticks:{...co.scales.y.ticks,callback:v=>v+'%'}}}}});
 }
 
+let eocCurrentPage = 1;
+const EOC_PAGE_SIZE = 15;
+let eocFiltered = [];
+
 function renderEOC() {
   const e = F.eoc;
   if (!e.length) { document.getElementById('eocBody').innerHTML='<tr><td colspan="10"><div class="empty"><span>📋</span>No EOC data — submit your first EOC form to see data here</div></td></tr>'; return; }
+  eocFiltered = e;
+  eocCurrentPage = 1;
+  drawEOCPage();
+}
+
+function searchEOC() {
+  const q = document.getElementById('eocSearch').value.toLowerCase().trim();
+  eocFiltered = q
+    ? F.eoc.filter(r => Object.values(r).some(v => String(v||'').toLowerCase().includes(q)))
+    : F.eoc;
+  eocCurrentPage = 1;
+  drawEOCPage();
+}
+
+function eocPage(dir) {
+  const total = Math.ceil(eocFiltered.length / EOC_PAGE_SIZE);
+  eocCurrentPage = Math.min(Math.max(1, eocCurrentPage + dir), total);
+  drawEOCPage();
+  document.querySelector('.card.bl').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function drawEOCPage() {
+  const e = eocFiltered;
+  if (!e.length) { document.getElementById('eocBody').innerHTML='<tr><td colspan="10"><div class="empty"><span>🔍</span>No results found</div></td></tr>'; return; }
+  const total = Math.ceil(e.length / EOC_PAGE_SIZE);
+  const start = (eocCurrentPage - 1) * EOC_PAGE_SIZE;
+  const page = e.slice(start, start + EOC_PAGE_SIZE);
+
   const ek=fk(e[0],['Lead Email','Email','Lead Email (same as CRM)']);
   const ck2=fk(e[0],['Closer','closer']);
   const sk2=fk(e[0],['Setter','setter']);
@@ -440,9 +487,10 @@ function renderEOC() {
   const revk=fk(e[0],['Rev Generated','Revenue Generated']);
   const outk=fk(e[0],['Outcome','outcome','What was the o']);
   const reck=fk(e[0],['Call Recording','Recording','Fathom']);
-  document.getElementById('eocBody').innerHTML=e.map(r=>{
-    const flag=isYes(r[ok2])&&num(r[cashk])===0;
-    const rec=r[reck]&&String(r[reck]).startsWith('http');
+
+  document.getElementById('eocBody').innerHTML = page.map(r => {
+    const flag = isYes(r[ok2]) && num(r[cashk]) === 0;
+    const rec = r[reck] && String(r[reck]).startsWith('http');
     return `<tr class="${flag?'tr-flag':''}">
       <td>${flag?'⚠️':''}</td>
       <td>${r[ek]||'—'}</td><td>${r[ck2]||'—'}</td><td>${r[sk2]||'—'}</td>
@@ -450,10 +498,15 @@ function renderEOC() {
       <td>${isYes(r[ok2])?'<span class="badge bb">Yes</span>':'<span class="badge ba">No</span>'}</td>
       <td style="color:var(--green)">${$f(r[cashk])}</td>
       <td style="color:var(--blue)">${$f(r[revk]||r[cashk])}</td>
-      <td style="max-width:200px;font-size:11px">${r[outk]||'—'}</td>
+      <td style="max-width:180px;font-size:11px">${r[outk]||'—'}</td>
       <td>${rec?`<a href="${r[reck]}" target="_blank" class="btn-sm">View ↗</a>`:'—'}</td>
     </tr>`;
   }).join('');
+
+  const label = `Page ${eocCurrentPage} of ${total} · ${e.length} calls`;
+  document.getElementById('eocPageLabel').textContent = label;
+  document.getElementById('eocPageLabel2').textContent = label;
+  document.getElementById('eocCount').textContent = `Showing ${start+1}–${Math.min(start+EOC_PAGE_SIZE, e.length)} of ${e.length}`;
 }
 
 function renderVal() {
@@ -476,19 +529,7 @@ function renderVal() {
     : '<div class="val-list"><div class="val-item vc">✓ No mismatches detected — EOC and EOD totals align</div></div>';
 }
 
-function renderDup() {
-  const e=F.eoc, pb=F.pb;
-  const ek=e.length?fk(e[0],['Lead Email','Email','Lead Email (same as CRM)']):'Lead Email';
-  const lk=pb.length?fk(pb[0],['Lead Name','Lead','Name']):'Lead Name';
-  const all=[...e.map(r=>r[ek]),...pb.map(r=>r[lk])].filter(Boolean).map(v=>String(v).toLowerCase().trim());
-  const counts={};
-  all.forEach(v=>{counts[v]=(counts[v]||0)+1;});
-  const dups=Object.entries(counts).filter(([,v])=>v>1);
-  const el=document.getElementById('dupSection');
-  el.innerHTML=dups.length
-    ? `<div class="dup-list">${dups.map(([v,c])=>`<div class="dup-item">🔴 <b>${v}</b> — appears ${c}x across EOC + Post Booking</div>`).join('')}</div>`
-    : '<div class="val-list"><div class="val-item vc">✓ No duplicates detected across EOC and Post Booking forms</div></div>';
-}
+
 
 function renderObj() {
   const e=F.eoc, pb=F.pb;
