@@ -676,6 +676,8 @@ function drawFUPage() {
   document.getElementById('fuPageLabel2').textContent = lbl;
   document.getElementById('fuCount').textContent = `Showing ${start+1}–${Math.min(start+FU_PAGE_SIZE,fu.length)} of ${fu.length}`;
 }
+
+function renderFB() {
   const ec=F.eodC;
   const fbk=ec.length?fk(ec[0],['Feedback','feedback','Notes','Bottleneck']):'Feedback';
   const nk=ec.length?fk(ec[0],['Closer','closer','Rep','Name']):'Closer';
