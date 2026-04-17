@@ -190,20 +190,68 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <div class="section">
+    <div class="sec-title purple">Follow-Ups</div>
+    <div class="card pl">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="text" id="fuSearch" placeholder="Search lead, rep..." oninput="searchFU()" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;width:220px">
+          <span id="fuCount" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="fuPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+          <span id="fuPageLabel" style="font-size:11px;color:var(--muted);white-space:nowrap">Page 1</span>
+          <button onclick="fuPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+        </div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Rep</th><th>Lead Name</th><th>Description</th><th>Follow-Up Date</th><th>Submitted</th></tr></thead>
+        <tbody id="fuBody"><tr><td colspan="5"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+      </table></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px">
+        <button onclick="fuPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+        <span id="fuPageLabel2" style="font-size:11px;color:var(--muted)">Page 1</span>
+        <button onclick="fuPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+      </div>
+    </div>
+  </div>
+  <div class="section">
     <div class="sec-title amber">Data Validation — EOC vs EOD Cross-Check</div>
     <div class="card aml" id="valSection"><div class="loading"><div class="spin"></div></div></div>
   </div>
 
-
-
   <div class="section">
     <div class="sec-title amber">Common Objections</div>
-    <div class="obj-grid" id="objSection"><div class="loading"><div class="spin"></div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card aml">
+        <div style="font-size:12px;font-weight:600;margin-bottom:3px">Objection Breakdown</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">By frequency — pie chart</div>
+        <div style="position:relative;height:220px"><canvas id="objPieChart"></canvas></div>
+      </div>
+      <div class="card aml">
+        <div style="font-size:12px;font-weight:600;margin-bottom:12px">Objection Counts</div>
+        <div class="obj-grid" id="objSection"><div class="loading"><div class="spin"></div></div></div>
+      </div>
+    </div>
   </div>
 
   <div class="section">
     <div class="sec-title red">EOD Bottlenecks — Closer Feedback</div>
-    <div class="fb-grid" id="fbSection"><div class="loading"><div class="spin"></div></div></div>
+    <div class="card rl">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <span id="fbCount" style="font-size:11px;color:var(--muted)"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="fbPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+          <span id="fbPageLabel" style="font-size:11px;color:var(--muted);white-space:nowrap">Page 1</span>
+          <button onclick="fbPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+        </div>
+      </div>
+      <div class="fb-grid" id="fbSection"><div class="loading"><div class="spin"></div></div></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px">
+        <button onclick="fbPage(-1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">← Prev</button>
+        <span id="fbPageLabel2" style="font-size:11px;color:var(--muted)">Page 1</span>
+        <button onclick="fbPage(1)" style="background:var(--card2);border:.5px solid var(--border);color:var(--text);padding:5px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer">Next →</button>
+      </div>
+    </div>
   </div>
 
   <div class="section">
@@ -251,13 +299,14 @@ async function loadAll() {
   document.getElementById('upd').textContent = 'Loading...';
   try {
     showStatus('Connecting to Google Sheets...', 'info');
-    const [eoc, eodC, eodS, pb] = await Promise.all([
+    const [eoc, eodC, eodS, pb, fu] = await Promise.all([
       gviz('Form Responses 2'),
       gviz('Form Responses 3'),
       gviz('Form Responses 4'),
       gviz('Form Responses 5'),
+      gviz('Form Responses 1'),
     ]);
-    D = {eoc, eodC, eodS, pb};
+    D = {eoc, eodC, eodS, pb, fu};
     const total = eoc.length + eodC.length + eodS.length + pb.length;
     if (total === 0) {
       showStatus('⚠ Connected but no data found. Make sure your sheet is shared as "Anyone with the link → Viewer" and form responses are linked to the sheet.', 'error');
@@ -289,7 +338,7 @@ function applyFilters() {
     }
     return true;
   });
-  F = {eoc:filter(D.eoc), eodC:filter(D.eodC), eodS:filter(D.eodS), pb:filter(D.pb)};
+  F = {eoc:filter(D.eoc), eodC:filter(D.eodC), eodS:filter(D.eodS), pb:filter(D.pb), fu:filter(D.fu||[])};
   render();
 }
 
@@ -322,7 +371,7 @@ function goalBar(val, goal) {
 
 function render() {
   renderKPIs(); renderRec(); renderCloser(); renderSetter();
-  renderCharts(); renderEOC(); renderVal();
+  renderCharts(); renderEOC(); renderFU(); renderVal();
   renderObj(); renderFB(); renderPP();
 }
 
@@ -444,7 +493,7 @@ function renderCharts() {
 }
 
 let eocCurrentPage = 1;
-const EOC_PAGE_SIZE = 15;
+const EOC_PAGE_SIZE = 6;
 let eocFiltered = [];
 
 function renderEOC() {
@@ -542,18 +591,97 @@ function renderObj() {
   const el=document.getElementById('objSection');
   el.innerHTML=counts.length
     ? counts.map(o=>`<div class="obj-card"><div class="obj-type">${o.type}</div><div class="obj-count">${o.n}</div><div class="obj-pct">${((o.n/total)*100).toFixed(1)}% of all entries</div></div>`).join('')
-    : '<div class="empty"><span>💬</span>No objection keywords found yet — data appears once EOC and Post Booking forms are filled out</div>';
+    : '<div class="empty"><span>💬</span>No objection data yet</div>';
+
+  // Pie chart
+  if (charts.objPie) charts.objPie.destroy();
+  if (counts.length) {
+    const OBJ_COLORS=['#ffb347','#a78bfa','#5fa8ff','#3fe0a0'];
+    charts.objPie = new Chart(document.getElementById('objPieChart'),{
+      type:'doughnut',
+      data:{labels:counts.map(c=>c.type),datasets:[{data:counts.map(c=>c.n),backgroundColor:OBJ_COLORS.slice(0,counts.length).map(c=>c+'cc'),borderColor:OBJ_COLORS.slice(0,counts.length),borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#9898b0',font:{family:'DM Sans',size:11},padding:12,boxWidth:10}},tooltip:{backgroundColor:'#1e2336',titleColor:'#e8eaf0',bodyColor:'#6b7280',padding:10}}}
+    });
+  }
 }
 
-function renderFB() {
+function fbPage(dir) {
+  const total = Math.ceil(fbAll.length / FB_PAGE_SIZE);
+  fbCurrentPage = Math.min(Math.max(1, fbCurrentPage + dir), total || 1);
+  drawFBPage();
+}
+
+function drawFBPage() {
+  const start = (fbCurrentPage-1)*FB_PAGE_SIZE;
+  const page = fbAll.slice(start, start+FB_PAGE_SIZE);
+  const total = Math.ceil(fbAll.length / FB_PAGE_SIZE);
+  const el = document.getElementById('fbSection');
+  if (!page.length) { el.innerHTML='<div class="empty"><span>📝</span>No feedback submitted yet</div>'; return; }
+  el.innerHTML = page.map(r=>`<div class="fb-card"><div class="fb-name">${r.name}</div><div class="fb-txt">${r.fb}</div></div>`).join('');
+  const lbl = `Page ${fbCurrentPage} of ${total} · ${fbAll.length} entries`;
+  document.getElementById('fbPageLabel').textContent = lbl;
+  document.getElementById('fbPageLabel2').textContent = lbl;
+  document.getElementById('fbCount').textContent = `Showing ${start+1}–${Math.min(start+FB_PAGE_SIZE,fbAll.length)} of ${fbAll.length}`;
+}
+
+let fuCurrentPage = 1;
+const FU_PAGE_SIZE = 6;
+let fuFiltered = [];
+let fbCurrentPage = 1;
+const FB_PAGE_SIZE = 3;
+let fbAll = [];
+
+function renderFU() {
+  const fu = F.fu || D.fu || [];
+  fuFiltered = fu;
+  fuCurrentPage = 1;
+  drawFUPage();
+}
+
+function searchFU() {
+  const q = document.getElementById('fuSearch').value.toLowerCase().trim();
+  const fu = F.fu || D.fu || [];
+  fuFiltered = q ? fu.filter(r => Object.values(r).some(v => String(v||'').toLowerCase().includes(q))) : fu;
+  fuCurrentPage = 1;
+  drawFUPage();
+}
+
+function fuPage(dir) {
+  const total = Math.ceil(fuFiltered.length / FU_PAGE_SIZE);
+  fuCurrentPage = Math.min(Math.max(1, fuCurrentPage + dir), total || 1);
+  drawFUPage();
+}
+
+function drawFUPage() {
+  const fu = fuFiltered;
+  const el = document.getElementById('fuBody');
+  if (!fu.length) { el.innerHTML='<tr><td colspan="5"><div class="empty"><span>📋</span>No follow-up data yet — appears when reps submit the Follow-Up form</div></td></tr>'; document.getElementById('fuCount').textContent=''; return; }
+  const total = Math.ceil(fu.length / FU_PAGE_SIZE);
+  const start = (fuCurrentPage-1)*FU_PAGE_SIZE;
+  const page = fu.slice(start, start+FU_PAGE_SIZE);
+  const repk = fk(fu[0],['Rep Name','rep name','Setter','Rep','Name']);
+  const leadk = fk(fu[0],['Lead Name','lead name','Lead']);
+  const desk = fk(fu[0],['Description','description','Notes','notes']);
+  const fudk = fk(fu[0],['Follow UP Date','Follow Up Date','Follow-Up Date','followup']);
+  const tsk = fk(fu[0],['Timestamp','timestamp','Date','date']);
+  el.innerHTML = page.map(r => `<tr>
+    <td><span class="badge bp">${r[repk]||'—'}</span></td>
+    <td>${r[leadk]||'—'}</td>
+    <td style="max-width:220px;font-size:11px">${r[desk]||'—'}</td>
+    <td style="color:var(--amber)">${r[fudk]||'—'}</td>
+    <td style="font-size:11px;color:var(--muted)">${r[tsk]||'—'}</td>
+  </tr>`).join('');
+  const lbl = `Page ${fuCurrentPage} of ${total} · ${fu.length} follow-ups`;
+  document.getElementById('fuPageLabel').textContent = lbl;
+  document.getElementById('fuPageLabel2').textContent = lbl;
+  document.getElementById('fuCount').textContent = `Showing ${start+1}–${Math.min(start+FU_PAGE_SIZE,fu.length)} of ${fu.length}`;
+}
   const ec=F.eodC;
   const fbk=ec.length?fk(ec[0],['Feedback','feedback','Notes','Bottleneck']):'Feedback';
   const nk=ec.length?fk(ec[0],['Closer','closer','Rep','Name']):'Closer';
-  const fb=ec.filter(r=>r[fbk]&&String(r[fbk]).trim().length>2);
-  const el=document.getElementById('fbSection');
-  el.innerHTML=fb.length
-    ? fb.map(r=>`<div class="fb-card"><div class="fb-name">${r[nk]||'Closer'}</div><div class="fb-txt">${r[fbk]}</div></div>`).join('')
-    : '<div class="empty"><span>📝</span>No feedback submitted — appears when closers fill in the Feedback field on their EOD form</div>';
+  fbAll = ec.filter(r=>r[fbk]&&String(r[fbk]).trim().length>2).map(r=>({name:r[nk]||'Closer',fb:r[fbk]}));
+  fbCurrentPage = 1;
+  drawFBPage();
 }
 
 function renderPP() {
